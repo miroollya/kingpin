@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hack-font@3/build/web/hack.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kingpin - Network Cybersecurity CTF</title>
+  <style>
+    /* General Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      font-family: 'Hack', monospace;
+      background-color: black;
+      color: white;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Left Side - Coding Style Information and Matrix Effect */
+    .left {
+      width: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+    }
+
+    .info {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: white;
+      z-index: 1; /* Ensure text is above canvas */
+      background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+      padding: 20px;
+      width: 500px; /* Fixed width for the description box */
+      border-radius: 10px;
+      white-space: nowrap; /* Prevent the text from wrapping */
+    }
+
+    .info .key {
+      color: #00abf0; /* Blue for keys to match matrix effect */
+    }
+
+    /* Matrix Canvas */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* Right Side - Image Display */
+    .right {
+      width: 50%;
+      background-image: url('wall.jpeg'); /* Ensure wall.jpeg exists in your project folder */
+      background-size: cover;
+      background-position: center;
+      background-color: #222; /* Fallback color in case image doesn't load */
+    }
+
+    /* Button styling */
+    .links {
+      margin-top: 20px;
+    }
+
+    /* Button styling */
+    .btn {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 10px;
+      background-color: #00abf0;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-family: 'Hack', monospace;
+      font-size: 1.1rem;
+
+      /* Add transition for smooth color and transform changes */
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #008ac7; /* Darker blue on hover */
+      transform: scale(1.05); /* Slightly increase the size on hover */
+      cursor: pointer;
+    }
+
+    /* Loading container */
+    #loading {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .mario-container {
+      position: relative;
+      height: 100px;  /* Adjust based on sprite size */
+      width: 100%; /* Full width of the screen */
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; /* Start from the left */
+    }
+
+    #mario {
+      position: relative;
+      width: 100px;  /* Adjust based on sprite size */
+      animation: run 3s linear infinite; /* Infinite loop until the page finishes loading */
+    }
+
+    /* Animation: Move Mario across the screen */
+    @keyframes run {
+      0% {
+        left: 0;
+      }
+      100% {
+        left: 90%; /* Mario reaches the right side */
+      }
+    }
+
+    /* Body fade-in after load */
+    body.loaded {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    body.content-visible {
+      opacity: 1;
+    }
+
+      #loading-message {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 1.2rem;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    body.content-visible #loading-message {
+      opacity: 1; /* Fade in the message when the content is visible */
+    }
+
+
+
+
+    /* Mobile View */
+    @media screen and (max-width: 768px) {
+      body {
+        flex-direction: column; /* Stack the sections vertically */
+      }
+
+      .left, .right {
+        width: 100%;
+        height: 50vh; /* Make each section half of the screen height */
+      }
+
+      .info {
+        font-size: 0.9rem; /* Adjust font size for smaller screens */
+        width: 90%; /* Make it smaller on mobile */
+        padding: 15px;
+      }
+
+      canvas {
+        width: 100%; /* Make canvas take full width */
+      }
+
+      .btn {
+        font-size: 1rem;
+        padding: 8px 15px;
+      }
+    }
+  </style>
+
+</head>
+  <div id="loading">
+    <div class="mario-container">
+      <img src="mario.gif" alt="Mario running" id="mario">
+    </div>
+    <div class="obstacle"></div> <!-- Add obstacle element -->
+    <p id="loading-message">Running in Progress...</p>
+  </div>
+
+
+
+<body>
+  <!-- Left Side with Matrix Effect and Coding Format -->
+  <div class="left">
+    <canvas id="matrix"></canvas>
+    <div class="info">
+      <p><span class="key">name</span>: <span class="value">"Amirul Hakim"</span>,</p>
+      <p><span class="key">nickname</span>: <span class="value">"kingpin"</span>,</p>
+      <p><span class="key">description</span>: <span id="typed-description"></span>,</p>
+      <p><span class="key">contact</span>: {</p>
+      <p>&nbsp;&nbsp;<span class="key">email</span>: <span class="value">"hakimboredzz@gmail.com"</span>,</p>
+      <p>&nbsp;&nbsp;<span class="key">phone</span>: <span class="value">"0126068683"</span></p>
+      <p>},</p>
+      <p><span class="key">skills</span>: {</p>
+      <p>&nbsp;&nbsp;<span class="key">Web Application</span>: <span class="value">"70%"</span>,</p>
+      <p>&nbsp;&nbsp;<span class="key">Network</span>: <span class="value">"70%"</span>,</p>
+      <p>&nbsp;&nbsp;<span class="key">Python</span>: <span class="value">"60%"</span></p>
+      <p>},</p>
+      <p><span class="key">networking tools</span>: {</p>
+        <p>&nbsp;&nbsp;<span class="key">Wireshark</span>: <span class="value">"80%"</span>,</p>
+        <p>&nbsp;&nbsp;<span class="key">Nmap</span>: <span class="value">"70%"</span>,</p>
+        <p>&nbsp;&nbsp;<span class="key">Kali Linux</span>: <span class="value">"60%"</span></p>        
+      <p>}</p>
+      <div class="links">
+        <a href="https://miroollya.github.io" target="_blank" class="btn">Visit My Blog</a>
+        <a href="cv.pdf" target="_blank" class="btn">View My CV</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script>
+    var typed = new Typed("#typed-description", {
+      strings: ["\"Cybersecurity\"", "\"Network Engineer in Training\"", "\"Passionate about solving CTF challenges\""], // Strings for the typing effect
+      typeSpeed: 80,     // Speed of typing
+      backSpeed: 30,     // Speed of backspacing
+      loop: true         // Enable looping
+    });
+  </script>
+  
+
+  <!-- Right Side with Static Image -->
+  <div class="right"></div>
+
+  <!-- Matrix Effect Script -->
+  <script>
+    var canvas = document.getElementById('matrix');
+    var ctx = canvas.getContext('2d');
+
+    // Set canvas full screen for left side only
+    canvas.width = window.innerWidth / 2; // Adjust for half screen
+    canvas.height = window.innerHeight;
+
+    // Characters used for the matrix effect
+    var matrixChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()_+=-{}[]|:;<>,.?/';
+    matrixChars = matrixChars.split('');
+
+    var fontSize = 14;
+    var columns = canvas.width / fontSize;
+    var drops = [];
+
+    for (var x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00abf0'; // blue matrix characters
+      ctx.font = fontSize + 'px Courier New';
+
+      for (var i = 0; i < drops.length; i++) {
+        var text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    // Responsive resizing for the matrix effect
+    window.addEventListener('resize', function() {
+      canvas.width = window.innerWidth / 2;
+      canvas.height = window.innerHeight;
+      columns = canvas.width / fontSize;
+      drops = Array(columns).fill(1);
+    });
+
+    window.addEventListener('load', function() {
+  // Get loading element and loading message
+  const loadingElement = document.getElementById('loading');
+  const loadingMessage = document.getElementById('loading-message');
+  
+  // Show initial message while Mario is running
+  loadingMessage.textContent = "Running in Progress...";
+
+  // After 3 seconds (Mario finishes running), update the message and hide the loader
+  setTimeout(function() {
+    loadingMessage.textContent = "Mario reached the end! Your view is now ready.";
+    
+    // Wait for a short while before hiding the loader to show the final message
+    setTimeout(function() {
+      loadingElement.style.display = 'none';
+      document.body.classList.add('content-visible');
+    }, 1000); // Wait 1 second before hiding the loading screen
+  }, 2000); // Matches the duration of the Mario animation (3 seconds)
+});
+
+
+
+
+  </script>
+</body>
+</html>
