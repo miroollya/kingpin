@@ -216,6 +216,7 @@
         <p>&nbsp;&nbsp;<span class="key">Nmap</span>: <span class="value">"70%"</span>,</p>
         <p>&nbsp;&nbsp;<span class="key">Kali Linux</span>: <span class="value">"60%"</span></p>        
       <p>}</p>
+      <p><span class="key">current time</span>: <span id="clock" class="value"></span></p>
       <div class="links">
         <a href="https://miroollya.github.io" target="_blank" class="btn">Visit My Blog</a>
         <a href="cv.pdf" target="_blank" class="btn">View My CV</a>
@@ -307,8 +308,22 @@
   }, 2000); // Matches the duration of the Mario animation (3 seconds)
 });
 
+  function updateClock() {
+  const now = new Date();
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  };
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-US', options);
+}
 
+// Update the clock every second
+setInterval(updateClock, 1000);
 
+// Initialize the clock immediately
+updateClock();
 
   </script>
 </body>
